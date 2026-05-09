@@ -13,6 +13,22 @@ A transparent ML engine that explains the **why** behind the **how much** — bu
 
 ---
 
+## 📖 About the Project
+
+**Prophecy India** is an advanced real-estate intelligence platform designed to bring transparency to the Indian housing market. Unlike traditional "black-box" calculators, Prophecy uses a multi-tiered inference engine to provide not just a price, but a mathematical justification for that price.
+
+### The Core Problem
+The Indian real estate market is notoriously fragmented. Price discovery often relies on word-of-mouth or opaque aggregator data. For a buyer, understanding whether a property is "fairly priced" requires analyzing locality medians, builder premiums, and market sentiment—all of which are rarely available in one place.
+
+### The Prophecy Solution
+This project solves the discovery problem through:
+1.  **Localized Machine Learning**: A high-precision Linear Regression model trained on 13,000+ Bangalore records (R² 0.84) with per-feature contribution analysis.
+2.  **Explainable AI (XAI)**: Every prediction is broken down into specific contributors (e.g., "Area added ₹X Lakhs," "Locality adjustment was -₹Y Lakhs").
+3.  **Investment Scoring**: A 0–10 score that benchmarks the property against real-time locality or city-level pulses.
+4.  **Pan-India Scalability**: Extended to 33 major Indian cities using a benchmark-driven "City Index" model.
+
+---
+
 ## ⚡ Why This Stands Out
 
 Most real-estate predictors are black boxes. Prophecy is **two engines in one**, each transparent about its method:
@@ -23,38 +39,6 @@ Most real-estate predictors are black boxes. Prophecy is **two engines in one**,
 | 🌏 `city-index`   | Any of 33 Indian cities | Public median ₹/sqft benchmarks × area + BHK/bath adjustment factors + sentiment multiplier. Honest, free, reproducible. |
 
 Both paths return **the same shape of response**: price + ranked explanation + investment score + coords.
-
-| Capability | Description |
-|---|---|
-| 🧠 **Explainable Predictions** | Exact per-feature contributions in ₹ Lakh — no opaque "black box". |
-| 📈 **Investment Score (0–10)** | Predicted ₹/sqft benchmarked against locality (BLR) or city (rest of India). |
-| ⚖️ **Comparison Engine** | Mumbai vs. Whitefield in one click — diff, %, and "better value per sqft". |
-| 🐂 **Sentiment Toggle** | Bullish / Neutral / Bearish multiplier reflects current market regime. |
-| 🗺️ **Atlas of India** | Leaflet map with 33 pulse-pinned cities + 100+ Bangalore localities. Click → load. |
-| ✨ **AI Sales Pitch** | Deterministic, offline template by default. Optional `OPENAI_API_KEY` swap. |
-| 🐳 **Production Ready** | `Dockerfile`, gunicorn entrypoint, CORS-enabled API. |
-
----
-
-## 🎨 The Redesign
-
-The UI was rebuilt from scratch around a single thesis: **"Architectural Blueprint × Property Intelligence."**
-
-| Decision | Why |
-|---|---|
-| **Color: midnight navy + terracotta + paper cream** | Feels like a blueprint at night. Anti-cliché for "tech blue" or "prop-tech green". The terracotta references Indian brass/copper aesthetics without leaning kitsch. |
-| **Type: Fraunces (display) + Inter Tight (body) + JetBrains Mono (data)** | Fraunces is an editorial variable serif — feels like a real-estate magazine, not an AI startup. Inter Tight has personality without going Inter-default. |
-| **Layout: asymmetric, no card grids** | The "three-column-icon-title-paragraph" layout is the dead giveaway of an AI-generated landing page. Every section here has its own micro-theme. |
-| **Background: faint blueprint grid + subtle noise** | Looks intentional, not generated. The blueprint pattern reinforces the architectural metaphor. |
-| **Animations: GSAP + ScrollTrigger** | Word-by-word hero reveal, blueprint draw-on, scroll-linked counters, magnetic CTA — the page choreographs itself. |
-
-### Animation principles applied
-
-- **Easing**: `cubic-bezier(0.23, 1, 0.32, 1)` for entrances, `cubic-bezier(0.4, 0, 0.2, 1)` for state changes, `elastic.out(1, 0.5)` for the magnetic CTA snap-back.
-- **Stagger**: 70ms between hero words, 80ms between pipeline steps, 70ms between explainability bars.
-- **Duration ladder**: 180ms hover, 600–900ms reveal, 1.0s hero word reveal, 1.6s counter count-up.
-- **Hardware-accelerated**: every animation targets `transform` or `opacity` only.
-- **`prefers-reduced-motion`**: respected — page renders fully, no motion.
 
 ---
 
@@ -110,31 +94,35 @@ flowchart LR
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Technical Requirements & Setup
 
-```bash
-git clone https://github.com/Vaishnavi-Dubey/price_prediction.git
-cd price_prediction
-pip install -r requirements.txt
-python server.py
-# → http://127.0.0.1:5000
-```
+### Requirements
+*   **Python**: 3.9+ (Tested on 3.11)
+*   **OS**: Windows/macOS/Linux
+*   **Memory**: ~500MB (Lightweight model)
+
+### Installation Guide
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/Vaishnavi-Dubey/prophecy-india.git
+    cd prophecy-india
+    ```
+2.  **Install dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3.  **Run the application**:
+    ```bash
+    python server.py
+    ```
+    *Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.*
 
 ### 🐳 Run with Docker
-
+If you prefer containerized deployment:
 ```bash
 docker build -t prophecy-india .
 docker run -p 5000:5000 prophecy-india
 ```
-
-### ✨ Optional LLM pitch
-
-```bash
-export OPENAI_API_KEY="sk-..."
-python server.py
-```
-
-Without the key, `/sales_pitch` falls back to a deterministic template — **zero external dependencies required**.
 
 ---
 
@@ -144,74 +132,25 @@ Without the key, `/sales_pitch` falls back to a deterministic template — **zer
 |---|---|---|---|
 | `GET`  | `/get_location_names` | — | Bangalore localities |
 | `GET`  | `/cities`             | — | 33 Indian cities + benchmarks |
-| `GET`  | `/coords`             | — | BLR locality lat/lng |
+| `GET`  | `/areas/<city>`       | — | Areas within a specific city |
 | `POST` | `/predict_home_price` | `city, location?, total_sqft, bhk, bath, sentiment` | price + explanation + investment |
-| `POST` | `/compare_locations`  | `city_a, location_a?, city_b, location_b?, total_sqft, bhk, bath, sentiment` | side-by-side |
-| `POST` | `/sales_pitch`        | `city, location?, total_sqft, bhk, bath, sentiment` | one-paragraph pitch |
-
-### Sample — `POST /predict_home_price`
-
-**Bangalore + locality** (full ML model):
-```json
-{
-  "city": "Bangalore",
-  "location": "Whitefield",
-  "estimated_price": 69.75,
-  "mode": "ml-localized",
-  "explanation": [
-    { "feature": "Area: 1200 sqft",       "contribution_lakh":  96.14 },
-    { "feature": "Locality: Whitefield",  "contribution_lakh": -27.69 },
-    { "feature": "2 bathroom(s)",         "contribution_lakh":   7.43 },
-    { "feature": "2 BHK",                 "contribution_lakh":  -3.00 }
-  ],
-  "investment": { "score": 4.4, "verdict": "Overpriced", "benchmark_source": "locality" }
-}
-```
-
-**Mumbai** (city-index):
-```json
-{
-  "city": "Mumbai",
-  "estimated_price": 300.0,
-  "mode": "city-index",
-  "explanation": [
-    { "feature": "Base · Mumbai median (₹25,000/sqft × 1200 sqft)", "contribution_lakh": 300.0 }
-  ],
-  "investment": { "score": 5.0, "verdict": "Hold", "benchmark_source": "Mumbai median" }
-}
-```
 
 ---
 
 ## 📁 Project Layout
 
 ```
-price_prediction/
+prophecy-india/
 ├── server.py                          # Flask API + static SPA host
-├── wsgi.py                            # gunicorn entrypoint
 ├── util.py                            # 2-mode inference, XAI, scoring, pitch
 ├── app.html / app.css / app.js        # Redesigned SPA (GSAP + Leaflet)
-├── city_index.json                    # 33 Indian cities · public benchmarks
-├── locality_stats.json                # BLR locality medians (from data)
-├── locality_coords.json               # 100+ BLR localities geo
-├── columns.json                       # model feature ordering
 ├── banglore_home_prices_model.pickle  # trained sklearn model
+├── city_index.json                    # 33 Indian cities · public benchmarks
+├── city_areas.json                    # 346 curated areas across India
 ├── price-prediction.ipynb             # training + EDA notebook
-├── bhp.csv                            # cleaned dataset
-├── Bengaluru_House_Data.csv.xls       # raw dataset
 ├── requirements.txt
-├── Dockerfile
 └── README.md
 ```
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Train a multi-city model when free, structured pan-India listings open up
-- [ ] Per-locality time-series forecast for top 5 cities
-- [ ] LightGBM/CatBoost for non-linear gains
-- [ ] User accounts + saved-search portfolio
 
 ---
 
@@ -221,4 +160,8 @@ Built by **[Vaishnavi Dubey](https://github.com/Vaishnavi-Dubey)**.
 Bangalore dataset: [Bengaluru House Price Data (Kaggle)](https://www.kaggle.com/datasets/amitabhajoy/bengaluru-house-price-data).
 City benchmarks: aggregated public NHB Residex + listing medians (2024).
 
-> The numbers behind the engine — and the engine behind the numbers.
+> [!NOTE]
+> The previous `price_prediction` repository should be deleted manually from your GitHub settings as current API tokens do not have administrative `delete_repo` scopes.
+
+---
+© 2026 Prophecy India. Property Intelligence Reimagined.
